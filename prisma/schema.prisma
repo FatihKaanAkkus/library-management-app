@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  books   Book[]
+  ratings Rating[]
+}
+
+model Book {
+  id          Int    @id @default(autoincrement())
+  name        String
+  score       Float  @default(-1)
+  ratingCount Int    @default(0)
+  ratingTotal Int    @default(0)
+  userId      Int?
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  ratings Rating[]
+}
+
+model Rating {
+  id        Int @id @default(autoincrement())
+  userScore Int
+  bookId    Int
+  userId    Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  book Book @relation(fields: [bookId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
